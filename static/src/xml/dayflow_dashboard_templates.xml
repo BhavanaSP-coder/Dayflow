@@ -65,7 +65,7 @@
 
                 <!-- ------------------------------------------- Quick cards -->
                 <div class="o_dayflow_kpi_grid">
-                    <div class="o_dayflow_kpi" t-on-click="openMyProfile">
+                    <div class="o_dayflow_kpi is-indigo" t-on-click="openMyProfile">
                         <div class="o_dayflow_kpi_top">
                             <span class="o_dayflow_kpi_label">Profile</span>
                             <span class="o_dayflow_kpi_icon"><i class="fa fa-user"/></span>
@@ -344,7 +344,7 @@
 
                 <!-- ------------------------------------------------- KPIs -->
                 <div class="o_dayflow_kpi_grid">
-                    <div class="o_dayflow_kpi" t-on-click="openEmployees">
+                    <div class="o_dayflow_kpi is-indigo" t-on-click="openEmployees">
                         <div class="o_dayflow_kpi_top">
                             <span class="o_dayflow_kpi_label">Employees</span>
                             <span class="o_dayflow_kpi_icon"><i class="fa fa-users"/></span>
