@@ -1,0 +1,967 @@
+// ==========================================================================
+// Dayflow HRMS - backend design system
+// Dashboards, kanban cards and form polish.
+// ==========================================================================
+
+.o_dayflow_dashboard,
+.o_dayflow_kanban,
+.o_dayflow_form {
+    --df-indigo: #5b5bd6;
+    --df-violet: #7c4dff;
+    --df-green: #00b894;
+    --df-amber: #f0932b;
+    --df-red: #eb4d4b;
+    --df-cyan: #0aa2c0;
+    --df-ink: #2c3050;
+    --df-muted: #6b7094;
+    --df-line: #e7e9f7;
+    --df-surface: #ffffff;
+    --df-canvas: #f4f5fb;
+    --df-radius: 16px;
+    --df-radius-sm: 10px;
+    --df-shadow: 0 6px 24px rgba(23, 26, 60, 0.07);
+    --df-shadow-lift: 0 12px 32px rgba(23, 26, 60, 0.13);
+}
+
+// ==========================================================================
+// Dashboard shell
+// ==========================================================================
+.o_dayflow_dashboard {
+    background: var(--df-canvas);
+    min-height: 100%;
+    overflow-y: auto;
+    padding: 20px 24px 48px;
+    color: var(--df-ink);
+    font-size: 14px;
+
+    @media (max-width: 767px) {
+        padding: 14px 12px 32px;
+    }
+}
+
+.o_dayflow_hero {
+    position: relative;
+    border-radius: var(--df-radius);
+    padding: 26px 30px;
+    margin-bottom: 20px;
+    color: #fff;
+    background: linear-gradient(135deg, var(--df-indigo) 0%, var(--df-violet) 100%);
+    box-shadow: var(--df-shadow-lift);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    flex-wrap: wrap;
+
+    &::after {
+        content: "";
+        position: absolute;
+        right: -60px;
+        top: -70px;
+        width: 240px;
+        height: 240px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.09);
+    }
+
+    > * {
+        position: relative;
+        z-index: 1;
+    }
+}
+
+.o_dayflow_hero_avatar {
+    width: 66px;
+    height: 66px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.2);
+    flex: 0 0 auto;
+}
+
+.o_dayflow_hero_text {
+    flex: 1 1 240px;
+    min-width: 0;
+
+    .o_dayflow_eyebrow {
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        font-size: 11px;
+        opacity: 0.78;
+        margin: 0;
+    }
+
+    h1 {
+        font-size: 25px;
+        font-weight: 700;
+        margin: 3px 0 5px;
+        line-height: 1.2;
+    }
+
+    .o_dayflow_hero_meta {
+        font-size: 13px;
+        opacity: 0.9;
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+
+        span {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+    }
+}
+
+.o_dayflow_hero_clock {
+    flex: 0 0 auto;
+    text-align: right;
+
+    .o_dayflow_clock_time {
+        font-size: 30px;
+        font-weight: 700;
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .o_dayflow_clock_date {
+        font-size: 12px;
+        opacity: 0.85;
+        margin-top: 3px;
+    }
+}
+
+.o_dayflow_hero_actions {
+    display: flex;
+    gap: 10px;
+    flex: 0 0 auto;
+    flex-wrap: wrap;
+}
+
+// ==========================================================================
+// Buttons
+// ==========================================================================
+.o_dayflow_btn {
+    border: 0;
+    border-radius: var(--df-radius-sm);
+    padding: 11px 20px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+
+    &:hover:not(:disabled) {
+        transform: translateY(-1px);
+    }
+
+    &:active:not(:disabled) {
+        transform: translateY(0);
+    }
+
+    &:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+    }
+}
+
+.o_dayflow_btn_light {
+    background: #fff;
+    color: var(--df-indigo);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.14);
+
+    &:hover:not(:disabled) {
+        background: #f6f6ff;
+    }
+}
+
+.o_dayflow_btn_amber {
+    background: var(--df-amber);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(240, 147, 43, 0.4);
+}
+
+.o_dayflow_btn_outline {
+    background: rgba(255, 255, 255, 0.14);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+
+    &:hover:not(:disabled) {
+        background: rgba(255, 255, 255, 0.24);
+    }
+}
+
+.o_dayflow_btn_ghost {
+    background: rgba(91, 91, 214, 0.08);
+    color: var(--df-indigo);
+    border: 0;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 12px;
+    padding: 5px 12px;
+
+    &:hover {
+        background: rgba(91, 91, 214, 0.16);
+        color: var(--df-indigo);
+    }
+}
+
+.o_dayflow_btn_ok,
+.o_dayflow_btn_no {
+    border: 0;
+    border-radius: 8px;
+    width: 30px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.o_dayflow_btn_ok {
+    background: rgba(0, 184, 148, 0.13);
+    color: #0b7a58;
+
+    &:hover { background: rgba(0, 184, 148, 0.25); color: #0b7a58; }
+}
+
+.o_dayflow_btn_no {
+    background: rgba(235, 77, 75, 0.13);
+    color: #a52222;
+
+    &:hover { background: rgba(235, 77, 75, 0.25); color: #a52222; }
+}
+
+// ==========================================================================
+// KPI cards
+// ==========================================================================
+.o_dayflow_kpi_grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.o_dayflow_kpi {
+    background: var(--df-surface);
+    border-radius: var(--df-radius);
+    padding: 18px 20px;
+    box-shadow: var(--df-shadow);
+    border: 1px solid var(--df-line);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    cursor: pointer;
+
+    &:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--df-shadow-lift);
+    }
+
+    &::before {
+        content: "";
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 4px;
+        background: var(--df-indigo);
+    }
+
+    &.is-green::before { background: var(--df-green); }
+    &.is-amber::before { background: var(--df-amber); }
+    &.is-red::before { background: var(--df-red); }
+    &.is-cyan::before { background: var(--df-cyan); }
+    &.is-violet::before { background: var(--df-violet); }
+}
+
+.o_dayflow_kpi_top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.o_dayflow_kpi_icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    background: rgba(91, 91, 214, 0.11);
+    color: var(--df-indigo);
+
+    .is-green & { background: rgba(0, 184, 148, 0.12); color: #0b7a58; }
+    .is-amber & { background: rgba(240, 147, 43, 0.14); color: #9a6300; }
+    .is-red & { background: rgba(235, 77, 75, 0.12); color: #a52222; }
+    .is-cyan & { background: rgba(10, 162, 192, 0.12); color: #0a6f83; }
+    .is-violet & { background: rgba(124, 77, 255, 0.12); color: var(--df-violet); }
+}
+
+.o_dayflow_kpi_label {
+    font-size: 12px;
+    color: var(--df-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+}
+
+.o_dayflow_kpi_value {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+}
+
+.o_dayflow_kpi_hint {
+    font-size: 12px;
+    color: var(--df-muted);
+    margin-top: 4px;
+}
+
+// ==========================================================================
+// Panels
+// ==========================================================================
+.o_dayflow_grid {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(12, 1fr);
+
+    @media (max-width: 991px) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.o_dayflow_col_8 { grid-column: span 8; @media (max-width: 991px) { grid-column: 1 / -1; } }
+.o_dayflow_col_6 { grid-column: span 6; @media (max-width: 991px) { grid-column: 1 / -1; } }
+.o_dayflow_col_4 { grid-column: span 4; @media (max-width: 991px) { grid-column: 1 / -1; } }
+.o_dayflow_col_12 { grid-column: 1 / -1; }
+
+.o_dayflow_panel {
+    background: var(--df-surface);
+    border-radius: var(--df-radius);
+    border: 1px solid var(--df-line);
+    box-shadow: var(--df-shadow);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.o_dayflow_panel_head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--df-line);
+
+    h2 {
+        font-size: 15px;
+        font-weight: 700;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        i { color: var(--df-indigo); }
+    }
+}
+
+.o_dayflow_panel_body {
+    padding: 18px 20px;
+    flex: 1 1 auto;
+}
+
+.o_dayflow_panel_link {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--df-indigo);
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+
+    &:hover { text-decoration: underline; }
+}
+
+// ==========================================================================
+// Week strip
+// ==========================================================================
+.o_dayflow_week {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+}
+
+.o_dayflow_day {
+    border-radius: 12px;
+    border: 1px solid var(--df-line);
+    padding: 10px 4px;
+    text-align: center;
+    background: #fbfbff;
+
+    &.is-weekend { background: #f2f3fa; opacity: 0.75; }
+    &.is-today { border-color: var(--df-indigo); box-shadow: 0 0 0 2px rgba(91, 91, 214, 0.16); }
+    &.is-present { background: #e9faf4; border-color: #b6ebd9; }
+    &.is-half_day { background: #fff6e8; border-color: #f6dcb4; }
+    &.is-absent { background: #fdeeee; border-color: #f5c6c6; }
+    &.is-leave { background: #eef2fd; border-color: #c6d3f5; }
+
+    .o_dayflow_day_name {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--df-muted);
+        font-weight: 600;
+    }
+
+    .o_dayflow_day_num {
+        font-size: 17px;
+        font-weight: 700;
+        line-height: 1.3;
+    }
+
+    .o_dayflow_day_hours {
+        font-size: 10px;
+        color: var(--df-muted);
+        font-variant-numeric: tabular-nums;
+    }
+}
+
+// ==========================================================================
+// Status dots, pills and badges
+// ==========================================================================
+.o_dayflow_status_dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+    flex: 0 0 auto;
+    background: var(--df-muted);
+
+    &.is-present { background: var(--df-green); }
+    &.is-half_day { background: var(--df-amber); }
+    &.is-absent { background: var(--df-red); }
+    &.is-leave { background: var(--df-cyan); }
+}
+
+.o_dayflow_pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border-radius: 20px;
+    padding: 3px 11px;
+    font-size: 11px;
+    font-weight: 600;
+    background: rgba(91, 91, 214, 0.1);
+    color: var(--df-indigo);
+}
+
+.o_dayflow_pill_indigo { background: rgba(91, 91, 214, 0.1); color: var(--df-indigo); }
+.o_dayflow_pill_soft { background: #f0f1fa; color: var(--df-muted); }
+
+.o_dayflow_days_chip {
+    background: linear-gradient(135deg, var(--df-indigo), var(--df-violet));
+    color: #fff;
+    border-radius: 10px;
+    padding: 5px 10px;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1;
+    flex: 0 0 auto;
+
+    small { font-size: 10px; opacity: 0.85; margin-left: 1px; }
+}
+
+// ==========================================================================
+// Bar chart (pure CSS - no external chart library)
+// ==========================================================================
+.o_dayflow_chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    height: 150px;
+    padding-top: 8px;
+}
+
+.o_dayflow_bar_col {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    height: 100%;
+    justify-content: flex-end;
+
+    .o_dayflow_bar_track {
+        width: 100%;
+        flex: 1 1 auto;
+        display: flex;
+        align-items: flex-end;
+        border-radius: 6px;
+        background: #f2f3fa;
+        overflow: hidden;
+    }
+
+    .o_dayflow_bar_fill {
+        width: 100%;
+        border-radius: 6px 6px 0 0;
+        background: linear-gradient(180deg, var(--df-violet), var(--df-indigo));
+        min-height: 3px;
+        transition: height 0.4s ease;
+    }
+
+    &.is-weekend .o_dayflow_bar_fill {
+        background: linear-gradient(180deg, #b8bcd8, #9aa0c4);
+    }
+
+    .o_dayflow_bar_label {
+        font-size: 10px;
+        color: var(--df-muted);
+        font-weight: 600;
+    }
+
+    .o_dayflow_bar_value {
+        font-size: 11px;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+    }
+}
+
+// ==========================================================================
+// Distribution / progress rows
+// ==========================================================================
+.o_dayflow_dist_row {
+    margin-bottom: 14px;
+
+    &:last-child { margin-bottom: 0; }
+
+    .o_dayflow_dist_top {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        font-size: 13px;
+        margin-bottom: 5px;
+
+        strong { font-weight: 600; }
+
+        .o_dayflow_dist_val {
+            color: var(--df-muted);
+            font-size: 12px;
+            font-variant-numeric: tabular-nums;
+        }
+    }
+
+    .o_dayflow_dist_track {
+        height: 8px;
+        border-radius: 20px;
+        background: #f0f1fa;
+        overflow: hidden;
+    }
+
+    .o_dayflow_dist_fill {
+        height: 100%;
+        border-radius: 20px;
+        background: linear-gradient(90deg, var(--df-indigo), var(--df-violet));
+        transition: width 0.4s ease;
+
+        &.is-present { background: linear-gradient(90deg, #0b9b7b, var(--df-green)); }
+        &.is-half_day { background: linear-gradient(90deg, #d98216, var(--df-amber)); }
+        &.is-absent { background: linear-gradient(90deg, #c93b39, var(--df-red)); }
+        &.is-leave { background: linear-gradient(90deg, #0a7f96, var(--df-cyan)); }
+    }
+}
+
+// ==========================================================================
+// Lists inside panels
+// ==========================================================================
+.o_dayflow_list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.o_dayflow_row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 11px 13px;
+    border-radius: 12px;
+    border: 1px solid var(--df-line);
+    background: #fbfbff;
+    transition: border-color 0.12s ease, box-shadow 0.12s ease;
+
+    &:hover {
+        border-color: rgba(91, 91, 214, 0.4);
+        box-shadow: 0 4px 14px rgba(23, 26, 60, 0.06);
+    }
+
+    .o_dayflow_row_main {
+        flex: 1 1 auto;
+        min-width: 0;
+    }
+
+    .o_dayflow_row_title {
+        font-weight: 600;
+        font-size: 13px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .o_dayflow_row_sub {
+        font-size: 12px;
+        color: var(--df-muted);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .o_dayflow_row_actions {
+        display: flex;
+        gap: 6px;
+        flex: 0 0 auto;
+    }
+}
+
+.o_dayflow_avatar_sm {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex: 0 0 auto;
+    background: #eceefb;
+}
+
+// ==========================================================================
+// Alerts / activity feed
+// ==========================================================================
+.o_dayflow_alert_row {
+    display: flex;
+    gap: 11px;
+    padding: 11px 13px;
+    border-radius: 12px;
+    border-left: 3px solid var(--df-indigo);
+    background: #f7f8fd;
+    margin-bottom: 9px;
+
+    &:last-child { margin-bottom: 0; }
+
+    &.is-success { border-left-color: var(--df-green); background: #f1fbf7; }
+    &.is-warning { border-left-color: var(--df-amber); background: #fff9f0; }
+    &.is-danger { border-left-color: var(--df-red); background: #fdf4f4; }
+    &.is-info { border-left-color: var(--df-cyan); background: #f2fafc; }
+
+    i { font-size: 15px; margin-top: 2px; color: var(--df-muted); }
+
+    .o_dayflow_alert_title { font-weight: 600; font-size: 13px; }
+    .o_dayflow_alert_msg { font-size: 12px; color: var(--df-muted); }
+}
+
+// ==========================================================================
+// Balance rings
+// ==========================================================================
+.o_dayflow_balances {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 14px;
+}
+
+.o_dayflow_balance {
+    text-align: center;
+    padding: 14px 8px;
+    border-radius: 12px;
+    background: #fbfbff;
+    border: 1px solid var(--df-line);
+
+    .o_dayflow_balance_val {
+        font-size: 24px;
+        font-weight: 700;
+        line-height: 1.1;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .o_dayflow_balance_of { font-size: 11px; color: var(--df-muted); }
+    .o_dayflow_balance_name { font-size: 12px; font-weight: 600; margin-top: 5px; }
+
+    .o_dayflow_balance_track {
+        height: 5px;
+        border-radius: 20px;
+        background: #eceefb;
+        margin-top: 8px;
+        overflow: hidden;
+    }
+
+    .o_dayflow_balance_fill {
+        height: 100%;
+        border-radius: 20px;
+        background: linear-gradient(90deg, var(--df-indigo), var(--df-violet));
+    }
+
+    &.is-sick .o_dayflow_balance_fill { background: linear-gradient(90deg, #c93b39, var(--df-red)); }
+    &.is-unpaid .o_dayflow_balance_fill { background: linear-gradient(90deg, #9aa0c4, #b8bcd8); }
+}
+
+// ==========================================================================
+// Quick switch (HR: jump to an employee)
+// ==========================================================================
+.o_dayflow_switch {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+
+    select,
+    input {
+        border: 1px solid var(--df-line);
+        border-radius: var(--df-radius-sm);
+        padding: 8px 12px;
+        font-size: 13px;
+        background: #fff;
+        color: var(--df-ink);
+        min-width: 190px;
+
+        &:focus {
+            outline: none;
+            border-color: var(--df-indigo);
+            box-shadow: 0 0 0 3px rgba(91, 91, 214, 0.15);
+        }
+    }
+}
+
+// ==========================================================================
+// Empty state / loader
+// ==========================================================================
+.o_dayflow_empty {
+    text-align: center;
+    padding: 26px 12px;
+    color: var(--df-muted);
+
+    i { font-size: 30px; opacity: 0.4; display: block; margin-bottom: 10px; }
+    p { margin: 0; font-size: 13px; }
+}
+
+.o_dayflow_loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 60px 0;
+    color: var(--df-muted);
+    font-size: 14px;
+}
+
+// ==========================================================================
+// Kanban cards
+// ==========================================================================
+.o_dayflow_kanban {
+    .o_dayflow_card {
+        padding: 14px 15px;
+        border-radius: var(--df-radius);
+        border: 1px solid var(--df-line);
+        background: var(--df-surface);
+        box-shadow: 0 2px 10px rgba(23, 26, 60, 0.05);
+        transition: transform 0.14s ease, box-shadow 0.14s ease;
+
+        &:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--df-shadow-lift);
+        }
+    }
+
+    .o_dayflow_card_head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+
+    .o_dayflow_card_titles { min-width: 0; }
+
+    .o_dayflow_card_title {
+        display: block;
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--df-ink);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .o_dayflow_card_sub {
+        display: block;
+        font-size: 12px;
+        color: var(--df-muted);
+    }
+
+    .o_dayflow_code {
+        font-size: 11px;
+        color: var(--df-muted);
+        font-variant-numeric: tabular-nums;
+    }
+
+    .o_dayflow_card_body { margin-bottom: 10px; }
+
+    .o_dayflow_meta {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: var(--df-muted);
+        margin-bottom: 3px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        i { width: 13px; text-align: center; opacity: 0.7; }
+    }
+
+    .o_dayflow_remarks { white-space: normal; }
+
+    .o_dayflow_card_foot {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding-top: 10px;
+        border-top: 1px solid var(--df-line);
+    }
+
+    .o_dayflow_kanban_actions { display: flex; gap: 5px; }
+
+    // Employee card specifics
+    .o_dayflow_emp_top {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        margin-bottom: 11px;
+    }
+
+    .o_dayflow_avatar_wrap { position: relative; flex: 0 0 auto; }
+
+    .o_dayflow_avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        object-fit: cover;
+        background: #eceefb;
+    }
+
+    .o_dayflow_presence {
+        position: absolute;
+        right: 0;
+        bottom: 1px;
+        width: 13px;
+        height: 13px;
+        border-radius: 50%;
+        border: 2px solid #fff;
+
+        &.is-in { background: var(--df-green); }
+        &.is-out { background: #c2c6de; }
+    }
+
+    .o_dayflow_emp_ident { min-width: 0; }
+
+    .o_dayflow_emp_meta { margin-bottom: 10px; }
+
+    .o_dayflow_dept_icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 11px;
+        background: linear-gradient(135deg, var(--df-indigo), var(--df-violet));
+        color: #fff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        flex: 0 0 auto;
+        margin-right: 11px;
+    }
+
+    .o_dayflow_badge_soft .badge {
+        background: #f0f1fa !important;
+        color: var(--df-muted) !important;
+    }
+}
+
+// ==========================================================================
+// Form polish
+// ==========================================================================
+.o_dayflow_form {
+    .o_dayflow_subtitle {
+        color: var(--df-muted);
+        font-weight: 400;
+        margin-top: 2px;
+    }
+
+    .o_dayflow_title_pills {
+        display: flex;
+        gap: 7px;
+        margin-top: 8px;
+        flex-wrap: wrap;
+    }
+
+    .o_dayflow_hint {
+        border-radius: 12px;
+        border: 0;
+        font-size: 13px;
+    }
+
+    .o_dayflow_strong input,
+    .o_dayflow_strong span {
+        font-weight: 700;
+    }
+
+    .o_dayflow_net input,
+    .o_dayflow_net span {
+        font-weight: 700;
+        color: var(--df-indigo);
+        font-size: 16px;
+    }
+}
+
+.o_dayflow_payslip_summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin: 16px 0 20px;
+}
+
+.o_dayflow_sum_card {
+    border-radius: 12px;
+    padding: 14px 16px;
+    border: 1px solid var(--df-line);
+    background: #fbfbff;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .o_dayflow_sum_label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        color: var(--df-muted);
+        font-weight: 600;
+    }
+
+    .o_dayflow_sum_value {
+        font-size: 19px;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+    }
+
+    &.is-net {
+        background: linear-gradient(135deg, var(--df-indigo), var(--df-violet));
+        border-color: transparent;
+
+        .o_dayflow_sum_label { color: rgba(255, 255, 255, 0.8); }
+        .o_dayflow_sum_value { color: #fff; }
+    }
+
+    &.is-ded .o_dayflow_sum_value { color: var(--df-red); }
+    &.is-lop .o_dayflow_sum_value { color: var(--df-amber); }
+}

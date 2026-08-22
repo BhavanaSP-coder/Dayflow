@@ -1,0 +1,617 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <!-- ==================================================================
+         Employee dashboard
+         ================================================================== -->
+    <t t-name="dayflow_hrms.EmployeeDashboard">
+        <div class="o_dayflow_dashboard">
+
+            <div t-if="state.loading" class="o_dayflow_loading">
+                <i class="fa fa-circle-o-notch fa-spin"/>
+                <span>Loading your workspace...</span>
+            </div>
+
+            <t t-elif="!state.data.has_profile">
+                <div class="o_dayflow_panel">
+                    <div class="o_dayflow_panel_body o_dayflow_empty">
+                        <i class="fa fa-user-times"/>
+                        <p>
+                            No Dayflow profile is linked to your account yet.<br/>
+                            Please ask your HR officer to create one for you.
+                        </p>
+                    </div>
+                </div>
+            </t>
+
+            <t t-else="">
+                <!-- ------------------------------------------------ Hero -->
+                <div class="o_dayflow_hero">
+                    <img class="o_dayflow_hero_avatar"
+                         t-att-src="avatar(state.data.employee.id)"
+                         t-att-alt="state.data.employee.name"/>
+                    <div class="o_dayflow_hero_text">
+                        <p class="o_dayflow_eyebrow">My workspace</p>
+                        <h1><t t-esc="state.data.employee.name"/></h1>
+                        <div class="o_dayflow_hero_meta">
+                            <span><i class="fa fa-id-badge"/><t t-esc="state.data.employee.code"/></span>
+                            <span><i class="fa fa-briefcase"/><t t-esc="state.data.employee.job_title"/></span>
+                            <span><i class="fa fa-sitemap"/><t t-esc="state.data.employee.department"/></span>
+                            <span><i class="fa fa-user-circle-o"/><t t-esc="state.data.employee.manager"/></span>
+                        </div>
+                    </div>
+                    <div class="o_dayflow_hero_clock">
+                        <div class="o_dayflow_clock_time"><t t-esc="state.clock.time"/></div>
+                        <div class="o_dayflow_clock_date"><t t-esc="state.clock.date"/></div>
+                    </div>
+                    <div class="o_dayflow_hero_actions">
+                        <button t-if="!isCheckedIn" class="o_dayflow_btn o_dayflow_btn_light"
+                                t-att-disabled="state.busy" t-on-click="toggleAttendance">
+                            <i class="fa fa-sign-in"/> Check In
+                        </button>
+                        <button t-else="" class="o_dayflow_btn o_dayflow_btn_amber"
+                                t-att-disabled="state.busy" t-on-click="toggleAttendance">
+                            <i class="fa fa-sign-out"/>
+                            Check Out
+                            <span t-if="state.data.attendance.checked_in_since">
+                                (since <t t-esc="state.data.attendance.checked_in_since"/>)
+                            </span>
+                        </button>
+                        <button class="o_dayflow_btn o_dayflow_btn_outline" t-on-click="logout">
+                            <i class="fa fa-power-off"/> Logout
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ------------------------------------------- Quick cards -->
+                <div class="o_dayflow_kpi_grid">
+                    <div class="o_dayflow_kpi" t-on-click="openMyProfile">
+                        <div class="o_dayflow_kpi_top">
+                            <span class="o_dayflow_kpi_label">Profile</span>
+                            <span class="o_dayflow_kpi_icon"><i class="fa fa-user"/></span>
+                        </div>
+                        <div class="o_dayflow_kpi_value"><t t-esc="state.data.employee.tenure"/></div>
+                        <div class="o_dayflow_kpi_hint">with the company &#183; open my profile</div>
+                    </div>
+
+                    <div class="o_dayflow_kpi is-green" t-on-click="openMyAttendance">
+                        <div class="o_dayflow_kpi_top">
+                            <span class="o_dayflow_kpi_label">Attendance</span>
+                            <span class="o_dayflow_kpi_icon"><i class="fa fa-clock-o"/></span>
+                        </div>
+                        <div class="o_dayflow_kpi_value">
+                            <t t-esc="formatHours(state.data.attendance.month.worked_hours)"/>
+                        </div>
+                        <div class="o_dayflow_kpi_hint">
+                            <t t-esc="state.data.attendance.month.present"/> present &#183;
+                            <t t-esc="state.data.attendance.month_label"/>
+                        </div>
+                    </div>
+
+                    <div class="o_dayflow_kpi is-cyan" t-on-click="openMyLeaves">
+                        <div class="o_dayflow_kpi_top">
+                            <span class="o_dayflow_kpi_label">Leave Balance</span>
+                            <span class="o_dayflow_kpi_icon"><i class="fa fa-plane"/></span>
+                        </div>
+                        <div class="o_dayflow_kpi_value">
+                            <t t-esc="formatDays(state.data.leave.balance_total)"/>
+                        </div>
+                        <div class="o_dayflow_kpi_hint">
+                            days left &#183; <t t-esc="state.data.leave.pending_count"/> pending
+                        </div>
+                    </div>
+
+                    <div class="o_dayflow_kpi is-violet" t-on-click="openMyPayslips">
+                        <div class="o_dayflow_kpi_top">
+                            <span class="o_dayflow_kpi_label">Last Payslip</span>
+                            <span class="o_dayflow_kpi_icon"><i class="fa fa-money"/></span>
+                        </div>
+                        <div class="o_dayflow_kpi_value"><t t-esc="money(state.data.payroll.last_net)"/></div>
+                        <div class="o_dayflow_kpi_hint">net pay &#183; read only</div>
+                    </div>
+                </div>
+
+                <!-- ---------------------------------------------- Panels -->
+                <div class="o_dayflow_grid">
+
+                    <!-- My week -->
+                    <div class="o_dayflow_panel o_dayflow_col_8">
+                        <div class="o_dayflow_panel_head">
+                            <h2><i class="fa fa-calendar-check-o"/> My Week</h2>
+                            <button class="o_dayflow_panel_link" t-on-click="openMyAttendance">
+                                Full attendance
+                            </button>
+                        </div>
+                        <div class="o_dayflow_panel_body">
+                            <div class="o_dayflow_week">
+                                <div t-foreach="state.data.attendance.week" t-as="day" t-key="day.date"
+                                     t-att-class="dayClass(day)"
+                                     t-att-title="day.status_label">
+                                    <div class="o_dayflow_day_name"><t t-esc="day.label"/></div>
+                                    <div class="o_dayflow_day_num"><t t-esc="day.day_number"/></div>
+                                    <div class="o_dayflow_day_hours">
+                                        <t t-if="day.hours"><t t-esc="formatHours(day.hours)"/></t>
+                                        <t t-elif="day.status"><t t-esc="day.status_label"/></t>
+                                        <t t-else="">&#8212;</t>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="o_dayflow_dist_row" style="margin-top:18px;">
+                                <div class="o_dayflow_dist_top">
+                                    <strong>This month</strong>
+                                    <span class="o_dayflow_dist_val">
+                                        <t t-esc="state.data.attendance.month.present"/> present,
+                                        <t t-esc="state.data.attendance.month.half_day"/> half-day,
+                                        <t t-esc="state.data.attendance.month.leave"/> leave,
+                                        <t t-esc="state.data.attendance.month.absent"/> absent
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Alerts -->
+                    <div class="o_dayflow_panel o_dayflow_col_4">
+                        <div class="o_dayflow_panel_head">
+                            <h2><i class="fa fa-bell-o"/> Recent Activity</h2>
+                        </div>
+                        <div class="o_dayflow_panel_body">
+                            <div t-foreach="state.data.alerts" t-as="alert" t-key="alert_index"
+                                 t-attf-class="o_dayflow_alert_row is-#{alert.type}">
+                                <i t-attf-class="fa #{alert.icon}"/>
+                                <div>
+                                    <div class="o_dayflow_alert_title"><t t-esc="alert.title"/></div>
+                                    <div class="o_dayflow_alert_msg"><t t-esc="alert.message"/></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Leave balances -->
+                    <div class="o_dayflow_panel o_dayflow_col_6">
+                        <div class="o_dayflow_panel_head">
+                            <h2><i class="fa fa-suitcase"/> Leave Balances</h2>
+                            <button class="o_dayflow_panel_link" t-on-click="newLeaveRequest">
+                                Request time off
+                            </button>
+                        </div>
+                        <div class="o_dayflow_panel_body">
+                            <div class="o_dayflow_balances">
+                                <div t-foreach="state.data.leave.balances" t-as="balance"
+                                     t-key="balance.id" t-att-class="balanceClass(balance)">
+                                    <div class="o_dayflow_balance_val">
+                                        <t t-esc="formatDays(balance.remaining)"/>
+                                    </div>
+                                    <div class="o_dayflow_balance_of">
+                                        of <t t-esc="formatDays(balance.allocated)"/> days
+                                    </div>
+                                    <div class="o_dayflow_balance_name"><t t-esc="balance.name"/></div>
+                                    <div class="o_dayflow_balance_track">
+                                        <div class="o_dayflow_balance_fill"
+                                             t-attf-style="width: {{ balanceWidth(balance) }}"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent leave requests -->
+                    <div class="o_dayflow_panel o_dayflow_col_6">
+                        <div class="o_dayflow_panel_head">
+                            <h2><i class="fa fa-paper-plane-o"/> My Leave Requests</h2>
+                            <button class="o_dayflow_panel_link" t-on-click="openMyLeaves">
+                                See all
+                            </button>
+                        </div>
+                        <div class="o_dayflow_panel_body">
+                            <div t-if="!state.data.leave.recent.length" class="o_dayflow_empty">
+                                <i class="fa fa-plane"/>
+                                <p>No request yet. Time for a break?</p>
+                            </div>
+                            <div t-else="" class="o_dayflow_list">
+                                <div t-foreach="state.data.leave.recent" t-as="leave" t-key="leave.id"
+                                     class="o_dayflow_row" t-on-click="() => this.openLeave(leave.id)">
+                                    <div class="o_dayflow_row_main">
+                                        <div class="o_dayflow_row_title"><t t-esc="leave.type_name"/></div>
+                                        <div class="o_dayflow_row_sub">
+                                            <t t-esc="formatDate(leave.date_from)"/> &#8594;
+                                            <t t-esc="formatDate(leave.date_to)"/>
+                                            &#183; <t t-esc="formatDays(leave.duration)"/> d
+                                        </div>
+                                    </div>
+                                    <span t-attf-class="badge {{ stateBadge(leave.state) }}">
+                                        <t t-esc="leave.state_label"/>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payslips -->
+                    <div class="o_dayflow_panel o_dayflow_col_6">
+                        <div class="o_dayflow_panel_head">
+                            <h2><i class="fa fa-file-text-o"/> My Payslips</h2>
+                            <button class="o_dayflow_panel_link" t-on-click="openMyPayslips">
+                                See all
+                            </button>
+                        </div>
+                        <div class="o_dayflow_panel_body">
+                            <div t-if="!state.data.payroll.recent.length" class="o_dayflow_empty">
+                                <i class="fa fa-file-o"/>
+                                <p>No payslip published yet.</p>
+                            </div>
+                            <div t-else="" class="o_dayflow_list">
+                                <div t-foreach="state.data.payroll.recent" t-as="slip" t-key="slip.id"
+                                     class="o_dayflow_row" t-on-click="() => this.openPayslip(slip.id)">
+                                    <div class="o_dayflow_row_main">
+                                        <div class="o_dayflow_row_title"><t t-esc="slip.period"/></div>
+                                        <div class="o_dayflow_row_sub"><t t-esc="slip.name"/></div>
+                                    </div>
+                                    <strong><t t-esc="money(slip.net)"/></strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Shortcuts -->
+                    <div class="o_dayflow_panel o_dayflow_col_6">
+                        <div class="o_dayflow_panel_head">
+                            <h2><i class="fa fa-bolt"/> Quick Access</h2>
+                        </div>
+                        <div class="o_dayflow_panel_body">
+                            <div class="o_dayflow_list">
+                                <div class="o_dayflow_row" t-on-click="openMyProfile">
+                                    <span class="o_dayflow_kpi_icon"><i class="fa fa-user"/></span>
+                                    <div class="o_dayflow_row_main">
+                                        <div class="o_dayflow_row_title">My Profile</div>
+                                        <div class="o_dayflow_row_sub">Address, phone and picture</div>
+                                    </div>
+                                    <i class="fa fa-angle-right text-muted"/>
+                                </div>
+                                <div class="o_dayflow_row" t-on-click="openMyAttendance">
+                                    <span class="o_dayflow_kpi_icon"><i class="fa fa-clock-o"/></span>
+                                    <div class="o_dayflow_row_main">
+                                        <div class="o_dayflow_row_title">My Attendance</div>
+                                        <div class="o_dayflow_row_sub">Daily and weekly tracking</div>
+                                    </div>
+                                    <i class="fa fa-angle-right text-muted"/>
+                                </div>
+                                <div class="o_dayflow_row" t-on-click="newLeaveRequest">
+                                    <span class="o_dayflow_kpi_icon"><i class="fa fa-plane"/></span>
+                                    <div class="o_dayflow_row_main">
+                                        <div class="o_dayflow_row_title">Apply for Leave</div>
+                                        <div class="o_dayflow_row_sub">Paid, sick or unpaid</div>
+                                    </div>
+                                    <i class="fa fa-angle-right text-muted"/>
+                                </div>
+                                <div class="o_dayflow_row" t-on-click="openMyDocuments">
+                                    <span class="o_dayflow_kpi_icon"><i class="fa fa-folder-open-o"/></span>
+                                    <div class="o_dayflow_row_main">
+                                        <div class="o_dayflow_row_title">My Documents</div>
+                                        <div class="o_dayflow_row_sub">Contracts and certificates</div>
+                                    </div>
+                                    <i class="fa fa-angle-right text-muted"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>
+
+    <!-- ==================================================================
+         HR / Admin dashboard
+         ================================================================== -->
+    <t t-name="dayflow_hrms.HrDashboard">
+        <div class="o_dayflow_dashboard">
+
+            <div t-if="state.loading" class="o_dayflow_loading">
+                <i class="fa fa-circle-o-notch fa-spin"/>
+                <span>Crunching today's numbers...</span>
+            </div>
+
+            <t t-else="">
+                <!-- ------------------------------------------------ Hero -->
+                <div class="o_dayflow_hero">
+                    <div class="o_dayflow_hero_text">
+                        <p class="o_dayflow_eyebrow">Admin / HR Officer</p>
+                        <h1>People Overview</h1>
+                        <div class="o_dayflow_hero_meta">
+                            <span><i class="fa fa-users"/><t t-esc="state.data.kpi.headcount"/> employees</span>
+                            <span><i class="fa fa-calendar"/><t t-esc="state.data.kpi.month_label"/></span>
+                            <span><i class="fa fa-user-plus"/><t t-esc="state.data.kpi.new_joiners"/> new this month</span>
+                        </div>
+                    </div>
+                    <div class="o_dayflow_hero_clock">
+                        <div class="o_dayflow_clock_time"><t t-esc="state.clock.time"/></div>
+                        <div class="o_dayflow_clock_date"><t t-esc="state.clock.date"/></div>
+                    </div>
+                    <div class="o_dayflow_hero_actions">
+                        <button class="o_dayflow_btn o_dayflow_btn_light" t-on-click="openApprovals">
+                            <i class="fa fa-check-square-o"/>
+                            Approvals
+                            <span t-if="state.data.kpi.pending_leaves" class="badge text-bg-danger ms-1">
+                                <t t-esc="state.data.kpi.pending_leaves"/>
+                            </span>
+                        </button>
+                        <button class="o_dayflow_btn o_dayflow_btn_outline" t-on-click="generatePayslips">
+                            <i class="fa fa-calculator"/> Run Payroll
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ------------------------------------------------- KPIs -->
+                <div class="o_dayflow_kpi_grid">
+                    <div class="o_dayflow_kpi" t-on-click="openEmployees">
+                        <div class="o_dayflow_kpi_top">
+                            <span class="o_dayflow_kpi_label">Employees</span>
+                            <span class="o_dayflow_kpi_icon"><i class="fa fa-users"/></span>
+                        </div>
+                        <div class="o_dayflow_kpi_value"><t t-esc="state.data.kpi.headcount"/></div>
+                        <div class="o_dayflow_kpi_hint">active headcount</div>
+                    </div>
+
+                    <div class="o_dayflow_kpi is-green" t-on-click="openAttendance">
+                        <div class="o_dayflow_kpi_top">
+                            <span class="o_dayflow_kpi_label">Present Today</span>
+                            <span class="o_dayflow_kpi_icon"><i class="fa fa-check-circle"/></span>
+                        </div>
+                        <div class="o_dayflow_kpi_value"><t t-esc="state.data.kpi.present_today"/></div>
+                        <div class="o_dayflow_kpi_hint">
+                            <t t-esc="state.data.kpi.attendance_rate"/>% attendance rate
+                        </div>
+                    </div>
+
+                    <div class="o_dayflow_kpi is-amber" t-on-click="openApprovals">
+                        <div class="o_dayflow_kpi_top">
+                            <span class="o_dayflow_kpi_label">Pending Leave</span>
+                            <span class="o_dayflow_kpi_icon"><i class="fa fa-hourglass-half"/></span>
+                        </div>
+                        <div class="o_dayflow_kpi_value"><t t-esc="state.data.kpi.pending_leaves"/></div>
+                        <div class="o_dayflow_kpi_hint">waiting for your decision</div>
+                    </div>
+
+                    <div class="o_dayflow_kpi is-cyan" t-on-click="openAttendance">
+                        <div class="o_dayflow_kpi_top">
+                            <span class="o_dayflow_kpi_label">On Leave Today</span>
+                            <span class="o_dayflow_kpi_icon"><i class="fa fa-plane"/></span>
+                        </div>
+                        <div class="o_dayflow_kpi_value"><t t-esc="state.data.kpi.on_leave_today"/></div>
+                        <div class="o_dayflow_kpi_hint">
+                            <t t-esc="state.data.kpi.absent_today"/> unaccounted for
+                        </div>
+                    </div>
+
+                    <div class="o_dayflow_kpi is-violet" t-on-click="openPayroll">
+                        <div class="o_dayflow_kpi_top">
+                            <span class="o_dayflow_kpi_label">Payroll</span>
+                            <span class="o_dayflow_kpi_icon"><i class="fa fa-money"/></span>
+                        </div>
+                        <div class="o_dayflow_kpi_value"><t t-esc="money(state.data.kpi.payroll_total)"/></div>
+                        <div class="o_dayflow_kpi_hint">
+                            <t t-esc="state.data.kpi.payroll_count"/> payslips this month
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ---------------------------------------------- Panels -->
+                <div class="o_dayflow_grid">
+
+                    <!-- Leave approvals -->
+                    <div class="o_dayflow_panel o_dayflow_col_8">
+                        <div class="o_dayflow_panel_head">
+                            <h2><i class="fa fa-check-square-o"/> Leave Approvals</h2>
+                            <button class="o_dayflow_panel_link" t-on-click="openApprovals">
+                                Open the full queue
+                            </button>
+                        </div>
+                        <div class="o_dayflow_panel_body">
+                            <div t-if="!state.data.pending_leaves.length" class="o_dayflow_empty">
+                                <i class="fa fa-check-circle"/>
+                                <p>Nothing is waiting for approval. Nice work.</p>
+                            </div>
+                            <div t-else="" class="o_dayflow_list">
+                                <div t-foreach="state.data.pending_leaves" t-as="leave" t-key="leave.id"
+                                     class="o_dayflow_row">
+                                    <img class="o_dayflow_avatar_sm"
+                                         t-att-src="avatar(leave.employee_id)"
+                                         t-att-alt="leave.employee_name"/>
+                                    <div class="o_dayflow_row_main"
+                                         t-on-click="() => this.openLeave(leave.id)">
+                                        <div class="o_dayflow_row_title">
+                                            <t t-esc="leave.employee_name"/>
+                                            <span class="o_dayflow_pill o_dayflow_pill_soft ms-1">
+                                                <t t-esc="leave.type_name"/>
+                                            </span>
+                                        </div>
+                                        <div class="o_dayflow_row_sub">
+                                            <t t-esc="formatDate(leave.date_from)"/> &#8594;
+                                            <t t-esc="formatDate(leave.date_to)"/>
+                                            &#183; <t t-esc="formatDays(leave.duration)"/> day(s)
+                                            <t t-if="leave.remarks"> &#183; <t t-esc="leave.remarks"/></t>
+                                        </div>
+                                    </div>
+                                    <div class="o_dayflow_row_actions">
+                                        <button class="btn btn-sm o_dayflow_btn_ok" title="Approve"
+                                                t-att-disabled="state.busy"
+                                                t-on-click="() => this.approveLeave(leave.id)">
+                                            <i class="fa fa-check"/>
+                                        </button>
+                                        <button class="btn btn-sm o_dayflow_btn_no" title="Reject"
+                                                t-att-disabled="state.busy"
+                                                t-on-click="() => this.rejectLeave(leave.id)">
+                                            <i class="fa fa-times"/>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Today at a glance -->
+                    <div class="o_dayflow_panel o_dayflow_col_4">
+                        <div class="o_dayflow_panel_head">
+                            <h2><i class="fa fa-pie-chart"/> Today</h2>
+                        </div>
+                        <div class="o_dayflow_panel_body">
+                            <div t-foreach="state.data.today_breakdown" t-as="row" t-key="row.key"
+                                 class="o_dayflow_dist_row">
+                                <div class="o_dayflow_dist_top">
+                                    <strong>
+                                        <span t-attf-class="o_dayflow_status_dot is-#{row.key} me-1"/>
+                                        <t t-esc="row.label"/>
+                                    </strong>
+                                    <span class="o_dayflow_dist_val">
+                                        <t t-esc="row.count"/> &#183; <t t-esc="row.percent"/>%
+                                    </span>
+                                </div>
+                                <div class="o_dayflow_dist_track">
+                                    <div t-attf-class="o_dayflow_dist_fill is-#{row.key}"
+                                         t-attf-style="width: {{ row.percent }}%"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Attendance trend -->
+                    <div class="o_dayflow_panel o_dayflow_col_8">
+                        <div class="o_dayflow_panel_head">
+                            <h2><i class="fa fa-line-chart"/> Attendance - last 14 days</h2>
+                            <button class="o_dayflow_panel_link" t-on-click="openReports">
+                                Full analytics
+                            </button>
+                        </div>
+                        <div class="o_dayflow_panel_body">
+                            <div class="o_dayflow_chart">
+                                <div t-foreach="state.data.attendance_trend" t-as="bar" t-key="bar.date"
+                                     t-attf-class="o_dayflow_bar_col #{bar.is_weekend ? 'is-weekend' : ''}"
+                                     t-att-title="bar.label">
+                                    <span class="o_dayflow_bar_value"><t t-esc="bar.value"/></span>
+                                    <div class="o_dayflow_bar_track">
+                                        <div class="o_dayflow_bar_fill"
+                                             t-attf-style="height: {{ bar.height }}%"/>
+                                    </div>
+                                    <span class="o_dayflow_bar_label"><t t-esc="bar.short"/></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick switch -->
+                    <div class="o_dayflow_panel o_dayflow_col_4">
+                        <div class="o_dayflow_panel_head">
+                            <h2><i class="fa fa-random"/> Quick Switch</h2>
+                            <button class="o_dayflow_panel_link" t-on-click="openEmployees">
+                                Directory
+                            </button>
+                        </div>
+                        <div class="o_dayflow_panel_body">
+                            <div class="o_dayflow_switch mb-3">
+                                <input type="text" class="w-100"
+                                       placeholder="Search an employee..."
+                                       t-model="state.search"/>
+                            </div>
+                            <div t-if="!filteredDirectory.length" class="o_dayflow_empty">
+                                <i class="fa fa-search"/>
+                                <p>No employee matches that search.</p>
+                            </div>
+                            <div t-else="" class="o_dayflow_list">
+                                <div t-foreach="filteredDirectory" t-as="employee" t-key="employee.id"
+                                     class="o_dayflow_row"
+                                     t-on-click="() => this.openEmployee(employee.id)">
+                                    <img class="o_dayflow_avatar_sm"
+                                         t-att-src="avatar(employee.id)"
+                                         t-att-alt="employee.name"/>
+                                    <div class="o_dayflow_row_main">
+                                        <div class="o_dayflow_row_title"><t t-esc="employee.name"/></div>
+                                        <div class="o_dayflow_row_sub">
+                                            <t t-esc="employee.job_title"/>
+                                            <t t-if="employee.job_title"> &#183; </t>
+                                            <t t-esc="employee.department"/>
+                                        </div>
+                                    </div>
+                                    <i class="fa fa-angle-right text-muted"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Departments -->
+                    <div class="o_dayflow_panel o_dayflow_col_6">
+                        <div class="o_dayflow_panel_head">
+                            <h2><i class="fa fa-sitemap"/> Headcount by Department</h2>
+                            <button class="o_dayflow_panel_link" t-on-click="openDepartments">
+                                Manage
+                            </button>
+                        </div>
+                        <div class="o_dayflow_panel_body">
+                            <div t-if="!state.data.departments.length" class="o_dayflow_empty">
+                                <i class="fa fa-sitemap"/>
+                                <p>No department created yet.</p>
+                            </div>
+                            <div t-foreach="state.data.departments" t-as="dept" t-key="dept.id"
+                                 class="o_dayflow_dist_row">
+                                <div class="o_dayflow_dist_top">
+                                    <strong><t t-esc="dept.name"/></strong>
+                                    <span class="o_dayflow_dist_val">
+                                        <t t-esc="dept.count"/> &#183; <t t-esc="dept.percent"/>%
+                                    </span>
+                                </div>
+                                <div class="o_dayflow_dist_track">
+                                    <div class="o_dayflow_dist_fill"
+                                         t-attf-style="width: {{ dept.percent }}%"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Management shortcuts -->
+                    <div class="o_dayflow_panel o_dayflow_col_6">
+                        <div class="o_dayflow_panel_head">
+                            <h2><i class="fa fa-bolt"/> Management</h2>
+                        </div>
+                        <div class="o_dayflow_panel_body">
+                            <div class="o_dayflow_list">
+                                <div class="o_dayflow_row" t-on-click="openEmployees">
+                                    <span class="o_dayflow_kpi_icon"><i class="fa fa-users"/></span>
+                                    <div class="o_dayflow_row_main">
+                                        <div class="o_dayflow_row_title">Employee List</div>
+                                        <div class="o_dayflow_row_sub">Profiles, jobs and salaries</div>
+                                    </div>
+                                    <i class="fa fa-angle-right text-muted"/>
+                                </div>
+                                <div class="o_dayflow_row" t-on-click="openAttendance">
+                                    <span class="o_dayflow_kpi_icon"><i class="fa fa-clock-o"/></span>
+                                    <div class="o_dayflow_row_main">
+                                        <div class="o_dayflow_row_title">Attendance Records</div>
+                                        <div class="o_dayflow_row_sub">Every employee, daily and weekly</div>
+                                    </div>
+                                    <i class="fa fa-angle-right text-muted"/>
+                                </div>
+                                <div class="o_dayflow_row" t-on-click="openPayroll">
+                                    <span class="o_dayflow_kpi_icon"><i class="fa fa-money"/></span>
+                                    <div class="o_dayflow_row_main">
+                                        <div class="o_dayflow_row_title">Payroll</div>
+                                        <div class="o_dayflow_row_sub">Payslips and salary structures</div>
+                                    </div>
+                                    <i class="fa fa-angle-right text-muted"/>
+                                </div>
+                                <div class="o_dayflow_row" t-on-click="openReports">
+                                    <span class="o_dayflow_kpi_icon"><i class="fa fa-bar-chart"/></span>
+                                    <div class="o_dayflow_row_main">
+                                        <div class="o_dayflow_row_title">Analytics &amp; Reports</div>
+                                        <div class="o_dayflow_row_sub">Attendance, leave and payroll</div>
+                                    </div>
+                                    <i class="fa fa-angle-right text-muted"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </div>
+    </t>
+
+</templates>

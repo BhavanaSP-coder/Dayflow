@@ -1,0 +1,302 @@
+// ==========================================================================
+// Dayflow HRMS - sign-in / sign-up / verification screens
+// ==========================================================================
+
+.o_dayflow_auth,
+.o_dayflow_login_brand,
+.o_dayflow_login_signup {
+    --df-indigo: #5b5bd6;
+    --df-violet: #7c4dff;
+    --df-green: #00b894;
+    --df-red: #eb4d4b;
+    --df-ink: #2c3050;
+    --df-muted: #6b7094;
+    --df-line: #e2e4f4;
+}
+
+// --------------------------------------------------------------------------
+// Branding block reused by the login page
+// --------------------------------------------------------------------------
+.o_dayflow_logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.o_dayflow_logo_mark {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--df-indigo), var(--df-violet));
+    color: #fff;
+    font-weight: 800;
+    font-size: 21px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 18px rgba(91, 91, 214, 0.36);
+}
+
+.o_dayflow_logo_text {
+    font-size: 25px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--df-ink);
+    background: linear-gradient(135deg, var(--df-indigo), var(--df-violet));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.o_dayflow_tagline {
+    color: var(--df-muted);
+    font-size: 13px;
+    margin: 8px 0 0;
+}
+
+.o_dayflow_login_brand {
+    text-align: center;
+    margin-bottom: 22px;
+}
+
+.o_dayflow_login_signup {
+    margin-top: 18px;
+    font-size: 13px;
+    color: var(--df-muted);
+
+    a {
+        color: var(--df-indigo);
+        font-weight: 600;
+        text-decoration: none;
+
+        &:hover { text-decoration: underline; }
+    }
+}
+
+// --------------------------------------------------------------------------
+// Auth shell
+// --------------------------------------------------------------------------
+.o_dayflow_auth {
+    color: var(--df-ink);
+
+    .o_dayflow_auth_brand {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .o_dayflow_auth_card {
+        background: #fff;
+        border-radius: 18px;
+        border: 1px solid var(--df-line);
+        box-shadow: 0 14px 40px rgba(23, 26, 60, 0.1);
+        padding: 28px 30px;
+
+        @media (max-width: 575px) {
+            padding: 22px 18px;
+        }
+    }
+
+    .o_dayflow_auth_title {
+        font-size: 22px;
+        font-weight: 700;
+        margin: 0 0 5px;
+    }
+
+    .o_dayflow_auth_sub {
+        font-size: 13px;
+        color: var(--df-muted);
+        margin: 0 0 20px;
+
+        a {
+            color: var(--df-indigo);
+            font-weight: 600;
+            text-decoration: none;
+
+            &:hover { text-decoration: underline; }
+        }
+    }
+
+    .o_dayflow_auth_foot {
+        text-align: center;
+        font-size: 12px;
+        color: var(--df-muted);
+        margin: 18px 0 0;
+    }
+}
+
+// --------------------------------------------------------------------------
+// Form
+// --------------------------------------------------------------------------
+.o_dayflow_form_grid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.o_dayflow_field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+    label {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--df-ink);
+        margin: 0;
+    }
+
+    .form-control,
+    .form-select {
+        border-radius: 10px;
+        border: 1px solid var(--df-line);
+        padding: 10px 13px;
+        font-size: 14px;
+        transition: border-color 0.12s ease, box-shadow 0.12s ease;
+
+        &:focus {
+            border-color: var(--df-indigo);
+            box-shadow: 0 0 0 3px rgba(91, 91, 214, 0.15);
+        }
+    }
+}
+
+.o_dayflow_help {
+    font-size: 11px;
+    color: var(--df-muted);
+
+    &.is-ok { color: #0b7a58; font-weight: 600; }
+    &.is-ko { color: #a52222; font-weight: 600; }
+}
+
+.o_dayflow_btn_primary {
+    background: linear-gradient(135deg, var(--df-indigo), var(--df-violet));
+    color: #fff;
+    border: 0;
+    border-radius: 10px;
+    padding: 12px 20px;
+    font-weight: 600;
+    font-size: 15px;
+    box-shadow: 0 8px 22px rgba(91, 91, 214, 0.32);
+    transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+
+    &:hover {
+        color: #fff;
+        transform: translateY(-1px);
+        filter: brightness(1.05);
+    }
+
+    &:active { transform: translateY(0); }
+}
+
+.o_dayflow_alert {
+    border-radius: 10px;
+    border: 0;
+    font-size: 13px;
+    background: #fdeeee;
+    color: #a52222;
+}
+
+// --------------------------------------------------------------------------
+// Password strength meter
+// --------------------------------------------------------------------------
+.o_dayflow_strength {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-top: 3px;
+
+    .o_dayflow_strength_bar {
+        flex: 1 1 auto;
+        height: 5px;
+        border-radius: 20px;
+        background: #eceefb;
+        overflow: hidden;
+
+        span {
+            display: block;
+            height: 100%;
+            width: 0;
+            border-radius: 20px;
+            background: var(--df-red);
+            transition: width 0.25s ease, background 0.25s ease;
+        }
+    }
+
+    .o_dayflow_strength_label {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--df-muted);
+        min-width: 74px;
+        text-align: right;
+    }
+
+    &.is-weak .o_dayflow_strength_bar span { width: 25%; background: var(--df-red); }
+    &.is-fair .o_dayflow_strength_bar span { width: 50%; background: #f0932b; }
+    &.is-good .o_dayflow_strength_bar span { width: 75%; background: #0aa2c0; }
+    &.is-strong .o_dayflow_strength_bar span { width: 100%; background: var(--df-green); }
+}
+
+.o_dayflow_rules {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 3px 12px;
+
+    li {
+        font-size: 11px;
+        color: var(--df-muted);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        i { font-size: 10px; opacity: 0.55; }
+
+        &.is-met {
+            color: #0b7a58;
+
+            i {
+                opacity: 1;
+                color: var(--df-green);
+            }
+        }
+    }
+}
+
+// --------------------------------------------------------------------------
+// Success / error states
+// --------------------------------------------------------------------------
+.o_dayflow_state {
+    text-align: center;
+
+    .o_dayflow_state_icon {
+        width: 62px;
+        height: 62px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 27px;
+        margin-bottom: 15px;
+        background: rgba(91, 91, 214, 0.1);
+        color: var(--df-indigo);
+    }
+
+    &.o_dayflow_state_success .o_dayflow_state_icon {
+        background: rgba(0, 184, 148, 0.12);
+        color: #0b7a58;
+    }
+
+    &.o_dayflow_state_warning .o_dayflow_state_icon {
+        background: rgba(240, 147, 43, 0.14);
+        color: #9a6300;
+    }
+
+    &.o_dayflow_state_danger .o_dayflow_state_icon {
+        background: rgba(235, 77, 75, 0.12);
+        color: #a52222;
+    }
+
+    .o_dayflow_auth_sub { margin-bottom: 16px; }
+}
