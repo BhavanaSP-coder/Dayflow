@@ -3,7 +3,7 @@
 from datetime import datetime
 from decimal import Decimal
 
-from sqlalchemy import DateTime, Integer, Numeric, UniqueConstraint, func
+from sqlalchemy import DateTime, ForeignKey, Integer, Numeric, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database.connection import Base
@@ -22,7 +22,7 @@ class Payroll(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
 
     # INTEGRATION POINT (Person 1): becomes ForeignKey("employees.id").
-    employee_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    employee_id: Mapped[int] = mapped_column(ForeignKey("employees.id", ondelete="CASCADE"), nullable=False, index=True)
 
     # Numeric, NOT Float. Floats lose pennies (0.1 + 0.2 != 0.3), which is
     # unacceptable for money. Numeric(12, 2) = up to 10 digits + 2 decimals.

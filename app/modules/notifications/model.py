@@ -3,7 +3,7 @@
 import enum
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, Enum, Integer, String, func
+from sqlalchemy import Boolean, DateTime, Enum, ForeignKey, Integer, String, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database.connection import Base
@@ -30,7 +30,9 @@ class Notification(Base):
 
     # INTEGRATION POINT (Person 1): becomes ForeignKey("users.id") once their
     # user table exists. This is the *user* id, not the employee id.
-    user_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("employees.id", ondelete="CASCADE"), nullable=False, index=True
+    )
 
     message: Mapped[str] = mapped_column(String(500), nullable=False)
     type: Mapped[NotificationType] = mapped_column(

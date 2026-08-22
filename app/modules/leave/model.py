@@ -8,7 +8,7 @@ Owner: Person 2 (leave / payroll / notifications / reports)
 import enum
 from datetime import date, datetime
 
-from sqlalchemy import Date, DateTime, Enum, Integer, String, func
+from sqlalchemy import Date, DateTime, Enum, ForeignKey, Integer, String, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database.connection import Base
@@ -46,7 +46,7 @@ class LeaveRequest(Base):
     #     )
     # (using whatever table/column name Person 1 actually used).
     # ------------------------------------------------------------------------
-    employee_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+    employee_id: Mapped[int] = mapped_column(ForeignKey("employees.id", ondelete="CASCADE"), nullable=False, index=True)
 
     leave_type: Mapped[LeaveType] = mapped_column(
         Enum(LeaveType, length=20), nullable=False
@@ -66,7 +66,9 @@ class LeaveRequest(Base):
 
     # Filled in by HR/Admin when they approve or reject (Phase 3).
     admin_comment: Mapped[str | None] = mapped_column(String(500), nullable=True)
-    reviewed_by: Mapped[int | None] = mapped_column(Integer, nullable=True, index=True)
+    reviewed_by: Mapped[int | None] = mapped_column(
+        ForeignKey("employees.id", ondelete="SET NULL"), nullable=True, index=True
+    )
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, server_default=func.now()
