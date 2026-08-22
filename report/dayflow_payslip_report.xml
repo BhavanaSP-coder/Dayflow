@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_report_dayflow_payslip" model="ir.actions.report">
+        <field name="name">Payslip</field>
+        <field name="model">dayflow.payslip</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">dayflow_hrms.report_dayflow_payslip</field>
+        <field name="report_file">dayflow_hrms.report_dayflow_payslip</field>
+        <field name="print_report_name">'Payslip - %s - %s' % (object.employee_id.name, object.period_label)</field>
+        <field name="binding_model_id" ref="model_dayflow_payslip"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_dayflow_payslip">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="slip">
+                <t t-call="web.external_layout">
+                    <div class="page o_dayflow_report">
+                        <style>
+                            .o_dayflow_report .df-head { border-bottom: 3px solid #5b5bd6; padding-bottom: 12px; margin-bottom: 22px; }
+                            .o_dayflow_report .df-title { font-size: 24px; font-weight: 700; color: #2c3050; margin: 0; }
+                            .o_dayflow_report .df-period { color: #6b7094; font-size: 13px; }
+                            .o_dayflow_report .df-grid { width: 100%; margin-bottom: 22px; }
+                            .o_dayflow_report .df-grid td { padding: 5px 0; font-size: 12px; vertical-align: top; }
+                            .o_dayflow_report .df-label { color: #6b7094; width: 130px; }
+                            .o_dayflow_report .df-value { font-weight: 600; color: #2c3050; }
+                            .o_dayflow_report table.df-lines { width: 100%; border-collapse: collapse; margin-bottom: 18px; }
+                            .o_dayflow_report table.df-lines th { background: #f4f5fb; color: #4a4f75; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; padding: 8px 10px; text-align: left; border-bottom: 2px solid #e4e6f5; }
+                            .o_dayflow_report table.df-lines td { padding: 7px 10px; font-size: 12px; border-bottom: 1px solid #eff0f8; }
+                            .o_dayflow_report table.df-lines td.num { text-align: right; font-variant-numeric: tabular-nums; }
+                            .o_dayflow_report .df-sub td { font-weight: 700; border-top: 2px solid #e4e6f5; border-bottom: none; }
+                            .o_dayflow_report .df-net { margin-top: 8px; background: #5b5bd6; color: #fff; padding: 14px 18px; border-radius: 8px; display: flex; justify-content: space-between; }
+                            .o_dayflow_report .df-net .lbl { font-size: 13px; text-transform: uppercase; letter-spacing: .08em; }
+                            .o_dayflow_report .df-net .val { font-size: 20px; font-weight: 700; }
+                            .o_dayflow_report .df-foot { margin-top: 26px; font-size: 10px; color: #8b90b0; border-top: 1px solid #eff0f8; padding-top: 10px; }
+                        </style>
+
+                        <div class="df-head">
+                            <h2 class="df-title">Salary Slip</h2>
+                            <div class="df-period">
+                                <span t-field="slip.period_label"/> &#183;
+                                <span t-field="slip.name"/>
+                            </div>
+                        </div>
+
+                        <table class="df-grid">
+                            <tr>
+                                <td class="df-label">Employee</td>
+                                <td class="df-value"><span t-field="slip.employee_id.name"/></td>
+                                <td class="df-label">Employee ID</td>
+                                <td class="df-value"><span t-field="slip.employee_id.employee_code"/></td>
+                            </tr>
+                            <tr>
+                                <td class="df-label">Designation</td>
+                                <td class="df-value"><span t-field="slip.employee_id.job_title"/></td>
+                                <td class="df-label">Department</td>
+                                <td class="df-value"><span t-field="slip.department_id.name"/></td>
+                            </tr>
+                            <tr>
+                                <td class="df-label">Period</td>
+                                <td class="df-value">
+                                    <span t-field="slip.date_from"/> to <span t-field="slip.date_to"/>
+                                </td>
+                                <td class="df-label">Payable Days</td>
+                                <td class="df-value"><span t-field="slip.payable_days"/></td>
+                            </tr>
+                            <tr t-if="slip.payment_date">
+                                <td class="df-label">Payment Date</td>
+                                <td class="df-value"><span t-field="slip.payment_date"/></td>
+                                <td class="df-label">Status</td>
+                                <td class="df-value"><span t-field="slip.state"/></td>
+                            </tr>
+                        </table>
+
+                        <table class="df-lines">
+                            <thead>
+                                <tr>
+                                    <th style="width:15%">Code</th>
+                                    <th>Earnings</th>
+                                    <th class="num" style="width:22%">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="slip.earning_line_ids" t-as="line">
+                                    <td><span t-field="line.code"/></td>
+                                    <td><span t-field="line.name"/></td>
+                                    <td class="num">
+                                        <span t-field="line.amount"
+                                              t-options="{'widget': 'monetary', 'display_currency': slip.currency_id}"/>
+                                    </td>
+                                </tr>
+                                <tr class="df-sub">
+                                    <td/>
+                                    <td>Gross Salary</td>
+                                    <td class="num">
+                                        <span t-field="slip.gross_salary"
+                                              t-options="{'widget': 'monetary', 'display_currency': slip.currency_id}"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <table class="df-lines">
+                            <thead>
+                                <tr>
+                                    <th style="width:15%">Code</th>
+                                    <th>Deductions</th>
+                                    <th class="num" style="width:22%">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="slip.deduction_line_ids" t-as="line">
+                                    <td><span t-field="line.code"/></td>
+                                    <td><span t-field="line.name"/></td>
+                                    <td class="num">
+                                        <span t-field="line.amount"
+                                              t-options="{'widget': 'monetary', 'display_currency': slip.currency_id}"/>
+                                    </td>
+                                </tr>
+                                <tr t-if="not slip.deduction_line_ids">
+                                    <td colspan="3" style="color:#8b90b0;">No deduction for this period.</td>
+                                </tr>
+                                <tr class="df-sub">
+                                    <td/>
+                                    <td>Total Deductions</td>
+                                    <td class="num">
+                                        <span t-field="slip.total_deductions"
+                                              t-options="{'widget': 'monetary', 'display_currency': slip.currency_id}"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="df-net">
+                            <span class="lbl">Net Pay</span>
+                            <span class="val">
+                                <span t-field="slip.net_salary"
+                                      t-options="{'widget': 'monetary', 'display_currency': slip.currency_id}"/>
+                            </span>
+                        </div>
+
+                        <div class="df-foot">
+                            This is a computer generated payslip and does not require a signature.
+                            Generated by Dayflow HRMS for
+                            <span t-field="slip.company_id.name"/>.
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>
