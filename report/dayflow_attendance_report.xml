@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_report_dayflow_attendance" model="ir.actions.report">
+        <field name="name">Attendance Sheet</field>
+        <field name="model">dayflow.employee</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">dayflow_hrms.report_dayflow_attendance</field>
+        <field name="report_file">dayflow_hrms.report_dayflow_attendance</field>
+        <field name="print_report_name">'Attendance - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="model_dayflow_employee"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_dayflow_attendance">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="employee">
+                <t t-call="web.external_layout">
+                    <div class="page o_dayflow_report">
+                        <style>
+                            .o_dayflow_report .df-head { border-bottom: 3px solid #5b5bd6; padding-bottom: 12px; margin-bottom: 20px; }
+                            .o_dayflow_report .df-title { font-size: 22px; font-weight: 700; color: #2c3050; margin: 0; }
+                            .o_dayflow_report .df-sub { color: #6b7094; font-size: 12px; }
+                            .o_dayflow_report table.df-att { width: 100%; border-collapse: collapse; }
+                            .o_dayflow_report table.df-att th { background: #f4f5fb; color: #4a4f75; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; padding: 8px 10px; text-align: left; border-bottom: 2px solid #e4e6f5; }
+                            .o_dayflow_report table.df-att td { padding: 6px 10px; font-size: 11px; border-bottom: 1px solid #eff0f8; }
+                            .o_dayflow_report .num { text-align: right; font-variant-numeric: tabular-nums; }
+                            .o_dayflow_report .tag { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 600; }
+                            .o_dayflow_report .tag-present { background: #e3f9f0; color: #0b7a58; }
+                            .o_dayflow_report .tag-half_day { background: #fff4e0; color: #9a6300; }
+                            .o_dayflow_report .tag-absent { background: #fdeaea; color: #a52222; }
+                            .o_dayflow_report .tag-leave { background: #eaf0fd; color: #2a4fb5; }
+                        </style>
+
+                        <div class="df-head">
+                            <h2 class="df-title">Attendance Sheet</h2>
+                            <div class="df-sub">
+                                <span t-field="employee.name"/> &#183;
+                                <span t-field="employee.employee_code"/> &#183;
+                                <span t-field="employee.department_id.name"/>
+                            </div>
+                        </div>
+
+                        <table class="df-att">
+                            <thead>
+                                <tr>
+                                    <th style="width:18%">Date</th>
+                                    <th style="width:18%">Check In</th>
+                                    <th style="width:18%">Check Out</th>
+                                    <th class="num" style="width:16%">Hours</th>
+                                    <th style="width:15%">Status</th>
+                                    <th>Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="employee.attendance_ids.sorted(lambda a: a.check_in, reverse=True)[:60]"
+                                    t-as="line">
+                                    <td><span t-field="line.check_in_date"/></td>
+                                    <td><span t-field="line.check_in" t-options="{'widget': 'datetime'}"/></td>
+                                    <td><span t-field="line.check_out" t-options="{'widget': 'datetime'}"/></td>
+                                    <td class="num"><span t-field="line.worked_hours"/></td>
+                                    <td>
+                                        <span t-attf-class="tag tag-#{line.status}">
+                                            <span t-field="line.status"/>
+                                        </span>
+                                    </td>
+                                    <td><span t-field="line.note"/></td>
+                                </tr>
+                                <tr t-if="not employee.attendance_ids">
+                                    <td colspan="6" style="color:#8b90b0;">No attendance recorded.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>
