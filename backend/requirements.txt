@@ -1,8 +1,0 @@
-# Dayflow HRMS - backend dependencies (Person 2: leave, payroll, notifications, reports)
-fastapi==0.141.1
-uvicorn[standard]==0.52.1
-SQLAlchemy==2.0.52
-PyMySQL==1.1.1
-cryptography==44.0.0
-pydantic==2.13.4
-python-dotenv==1.2.2
