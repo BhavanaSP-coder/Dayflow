@@ -20,3 +20,6 @@ python-multipart>=0.0.9
 
 # Environment Variables
 python-dotenv>=1.0.0
+
+# Timezone data (zoneinfo has no system tz database on Windows)
+tzdata>=2024.1

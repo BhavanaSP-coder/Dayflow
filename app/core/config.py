@@ -9,6 +9,10 @@ class Settings(BaseSettings):
 
     DATABASE_URL: str
 
+    # Single business timezone. Attendance days are bucketed by the local
+    # calendar date in this zone, not by UTC.
+    TIMEZONE: str = "Asia/Kolkata"
+
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 

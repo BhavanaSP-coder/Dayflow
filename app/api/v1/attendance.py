@@ -1,7 +1,7 @@
-from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.time_utils import business_today
 from app.db.database import get_db
 from app.schemas.attendance import CheckInRequest, CheckOutRequest, AttendanceResponse
 from app.crud import crud_attendance
@@ -17,7 +17,7 @@ async def check_in(
     current_user: Employee = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    today = datetime.now(timezone.utc).date()
+    today = business_today()
     existing_record = await crud_attendance.get_today_attendance(db, current_user.id, today)
     
     if existing_record and existing_record.check_in:
@@ -32,16 +32,19 @@ async def check_out(
     current_user: Employee = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    today = datetime.now(timezone.utc).date()
-    existing_record = await crud_attendance.get_today_attendance(db, current_user.id, today)
-    
-    if not existing_record or not existing_record.check_in:
+    # An overnight shift is dated by its check-in day, so look for the open
+    # shift rather than assuming it carries today's date.
+    open_record = await crud_attendance.get_open_attendance(db, current_user.id)
+
+    if open_record is None:
+        today_record = await crud_attendance.get_today_attendance(
+            db, current_user.id, business_today()
+        )
+        if today_record and today_record.check_out:
+            raise HTTPException(status_code=400, detail="You have already checked out today.")
         raise HTTPException(status_code=400, detail="You must check in before you can check out.")
-        
-    if existing_record.check_out:
-        raise HTTPException(status_code=400, detail="You have already checked out today.")
-        
-    return await crud_attendance.check_out_employee(db, existing_record, data)
+
+    return await crud_attendance.check_out_employee(db, open_record, data)
 
 
 @router.get("/history", response_model=list[AttendanceResponse])

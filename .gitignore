@@ -1,6 +1,7 @@
 # Python and Environments
 venv/
 env/
+hack/
 __pycache__/
 *.pyc
 
